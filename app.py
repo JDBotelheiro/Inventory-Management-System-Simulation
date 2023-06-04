@@ -82,7 +82,6 @@ def run():
         std_dev = product_sales['sales'].std()  # Assuming sales is a good proxy for demand. Replace with actual demand standard deviation if available
 
         eoq, safety_stock = calculate_eoq(D, K, h, L, Z, std_dev)
-        reorder_point = D * (L / 12) / 30 + safety_stock
         num_orders = int(D / eoq)
 
         # Calculate the reorder points
@@ -123,6 +122,7 @@ def run():
         excess_inventory_risk = round(max(0, expected_supply - expected_demand) / expected_supply, 1)
         # Add EOQ results to the DataFrame
         new_row = pd.DataFrame({'Component': [component],
+                        'Current Stock': [default_current_stock],
                         'EOQ': [eoq],
                         'Number of Orders for Next Month': [num_orders],
                         'Reorder Day': [reorder_days[0]] if reorder_days else ['No Need'],
@@ -147,7 +147,7 @@ def run():
                 <div class="content">
                     <div class="description"><br>
                         <div class="column kpi number">{str(int(row['Number of Orders for Next Month']))}<br>
-                            <p class="kpi text">Number of Orders for Next Month</p>
+                            <p class="kpi text">Number of Units for Next Month</p>
                         </div>
                         <div class="column kpi number">{str(row['Reorder Day'])}<br>
                             <p class="kpi text">Suggested Reorder Date</p>
@@ -155,6 +155,7 @@ def run():
                     </div>
                 </div>
                 <div class="extra content">
+                    <div class="meta"><i class="warehouse icon"></i> <strong>Current Stock:</strong> {str(int(row['Current Stock'])) + ' days'}</div>
                     <div class="meta"><i class="wait icon"></i> <strong>Lead Time:</strong> {str(int(row['Lead Time (days)'])) + ' days'}</div>
                     <div class="meta"><i class="shield icon"></i> <strong>Safety Stock Level:</strong> {str(round(row['Safety Stock Level']))}</div>
                     <div class="meta"><i class="dollar sign icon"></i> <strong>Total Inventory Cost:</strong> {str(int(row['Total Inventory Cost']))}</div>
