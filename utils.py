@@ -41,7 +41,7 @@ def sales_forecasting(product_sales):
     # Prepare data for sales forecasting
     product_sales['ordinal_datetime'] = product_sales['date'].map(datetime.datetime.toordinal).values.reshape(-1, 1)
     product_sales['month'] = product_sales['date'].dt.month
-    product_sales['week'] = product_sales['date'].dt.isocalendar().week
+    product_sales['week'] = product_sales['date'].dt.isocalendar().week.astype('int64')
     product_sales['sales_lag_1y'] = product_sales['sales'].shift(365)
     product_sales = product_sales.dropna(subset=['sales_lag_1y'])
     y = product_sales['sales'].values
@@ -56,7 +56,7 @@ def sales_forecasting(product_sales):
     
     future_dates['ordinal_datetime'] = future_dates['date'].map(datetime.datetime.toordinal)
     future_dates['month'] = future_dates['date'].dt.month
-    future_dates['week'] = future_dates['date'].dt.week
+    future_dates['week'] = future_dates['date'].dt.isocalendar().week.astype('int64')
     future_dates['sales'] = 0
     combined_data = pd.concat([future_dates[['date', 'ordinal_datetime', 'month', 'week', 'sales']], product_sales[['date', 'ordinal_datetime', 'month', 'week', 'sales']]], axis=0, ignore_index=True)
     combined_data = combined_data.sort_values(by="date")
