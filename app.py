@@ -135,6 +135,7 @@ def run():
                         'Current Stock': [default_current_stock],
                         'EOQ': [eoq],
                         'Number of Units for Next Month': [num_orders],
+                        'Next Months Projected Unit Usage': [D], 
                         'Reorder Day': [reorder_days[0]] if reorder_days else ['No Need'],
                         'Lead Time (days)': [supplier_lead_time],
                         'Safety Stock Level': [safety_stock],
