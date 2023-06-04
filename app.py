@@ -157,7 +157,7 @@ def run():
                 </div>
                 <div class="content">
                     <div class="description"><br>
-                        <div class="column kpi number">{str(int(row['Number of Orders for Next Month']))}<br>
+                        <div class="column kpi number">{str(int(row['Number of Units for Next Month']))}<br>
                             <p class="kpi text">Number of Units for Next Month</p>
                         </div>
                         <div class="column kpi number">{str(row['Reorder Day'])}<br>
