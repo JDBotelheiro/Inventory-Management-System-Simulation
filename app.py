@@ -155,10 +155,10 @@ def run():
                     </div>
                 </div>
                 <div class="extra content">
-                    <div class="meta"><i class="warehouse icon"></i> <strong>Current Stock:</strong> {str(int(row['Current Stock'])) + ' days'}</div>
+                    <div class="meta"><i class="warehouse icon"></i> <strong>Current Stock:</strong> {str(int(row['Current Stock'])) + ' units'}</div>
                     <div class="meta"><i class="wait icon"></i> <strong>Lead Time:</strong> {str(int(row['Lead Time (days)'])) + ' days'}</div>
-                    <div class="meta"><i class="shield icon"></i> <strong>Safety Stock Level:</strong> {str(round(row['Safety Stock Level']))}</div>
-                    <div class="meta"><i class="dollar sign icon"></i> <strong>Total Inventory Cost:</strong> {str(int(row['Total Inventory Cost']))}</div>
+                    <div class="meta"><i class="shield icon"></i> <strong>Safety Stock Level:</strong> {str(round(row['Safety Stock Level'])) + ' units'}</div>
+                    <div class="meta"><i class="dollar sign icon"></i> <strong>Total Inventory Cost:</strong> {str(int(row['Total Inventory Cost'])) + ' €'}</div>
                     <div class="meta"><i class="warning sign icon"></i> <strong>Stockout Risk:</strong> {str(int(row['Stockout Risk']))}</div>
                     <div class="meta"><i class="balance scale icon"></i> <strong>Excess Inventory Risk:</strong> {str(float(row['Excess Inventory Risk']))}</div>
                 </div>
