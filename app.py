@@ -83,7 +83,17 @@ def run():
 
         eoq, safety_stock = calculate_eoq(D, K, h, L, Z, std_dev)
         num_orders = int(D / eoq)
+        
+        # Calculate the number of orders for the worst case scenario
+        D_worst_case = sum(future_dates['y_forecast-hi-80'].values) * int(product_components[product_components['component'] == component]['required_quantity'].values[0]) # Add values required quantity
+        h_worst_case = holding_cost
+        L_worst_case = supplier_lead_time  # Lead time for supplier
+        Z_worst_case = norm.ppf(0.90)  # Z-score for 95% service level, change according to your needs
+        std_dev_worst_case = product_sales['sales'].std()  # Assuming sales is a good proxy for demand. Replace with actual demand standard deviation if available
 
+        eoq_worst_case, safety_stock_worst_case = calculate_eoq(D_worst_case, K, h_worst_case, L_worst_case, Z_worst_case, std_dev_worst_case)
+        num_orders_worst_case = int(D_worst_case / eoq_worst_case)
+        
         # Calculate the reorder points
         safety_stock = calculate_safety_stock(Z, std_dev, L)  # Set z_value, std_dev, lead_time appropriately
         reorder_point = D * (supplier_lead_time / 30) + safety_stock
@@ -124,13 +134,14 @@ def run():
         new_row = pd.DataFrame({'Component': [component],
                         'Current Stock': [default_current_stock],
                         'EOQ': [eoq],
-                        'Number of Orders for Next Month': [num_orders],
+                        'Number of Units for Next Month': [num_orders],
                         'Reorder Day': [reorder_days[0]] if reorder_days else ['No Need'],
                         'Lead Time (days)': [supplier_lead_time],
                         'Safety Stock Level': [safety_stock],
                         'Total Inventory Cost': [total_inventory_cost],
                         'Stockout Risk': [stockout_risk],
-                        'Excess Inventory Risk': [excess_inventory_risk]})
+                        'Excess Inventory Risk': [excess_inventory_risk], 
+                        'Worst Case Units for Next Month': [num_orders_worst_case]})
 
 
         eoq_results = pd.concat([eoq_results, new_row], ignore_index=True)
@@ -161,6 +172,7 @@ def run():
                     <div class="meta"><i class="dollar sign icon"></i> <strong>Total Inventory Cost:</strong> {str(int(row['Total Inventory Cost'])) + ' €'}</div>
                     <div class="meta"><i class="warning sign icon"></i> <strong>Stockout Risk:</strong> {str(int(row['Stockout Risk']))}</div>
                     <div class="meta"><i class="balance scale icon"></i> <strong>Excess Inventory Risk:</strong> {str(float(row['Excess Inventory Risk']))}</div>
+                    <div class="meta"><i class="cubes icon"></i> <strong>Worst Case Units for Next Month:</strong> {str(float(row['Worst Case Units for Next Month']))}</div>
                 </div>
         </div>"""
 
@@ -196,6 +208,7 @@ def run():
             - Safety Stock Level: Extra stock to prevent shortfalls from supply-demand uncertainties.
             - Total Inventory Cost: The cumulative cost of ordering, holding, and storing goods.
             - Stockout Risk: Risk of running out of an item, potentially hurting sales and customer loyalty.
-            - Excess Inventory Risk: Risk of having too much stock, leading to higher costs and potential wastage.""")
+            - Excess Inventory Risk: Risk of having too much stock, leading to higher costs and potential wastage.
+            - Worst Case Units for Next Month: Number of units to buy regarding the upper cofidence interval from the forecast model.""")
 if __name__ == '__main__':
     run()
