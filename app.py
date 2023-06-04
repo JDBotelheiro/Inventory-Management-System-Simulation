@@ -172,7 +172,7 @@ def run():
                     <div class="meta"><i class="dollar sign icon"></i> <strong>Total Inventory Cost:</strong> {str(int(row['Total Inventory Cost'])) + ' €'}</div>
                     <div class="meta"><i class="warning sign icon"></i> <strong>Stockout Risk:</strong> {str(int(row['Stockout Risk']))}</div>
                     <div class="meta"><i class="balance scale icon"></i> <strong>Excess Inventory Risk:</strong> {str(float(row['Excess Inventory Risk']))}</div>
-                    <div class="meta"><i class="cubes icon"></i> <strong>Worst Case Units for Next Month:</strong> {str(int(row['Worst Case Units for Next Month'])) + ' units'}</div>
+                    <div class="meta"><i class="cubes icon"></i> <strong>Worst Case Units for Next Month:</strong> {str(int(row['Worst Case Units for Next Month']))}</div>
                 </div>
         </div>"""
 
