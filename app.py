@@ -190,7 +190,7 @@ def run():
     st.markdown(f"""<br><br><br><br>""", unsafe_allow_html=True)
 
     st.markdown("""
-                GLoassary:
+                Glossary:
             - Lead Time: The time from placing to receiving an order.
             - Safety Stock Level: Extra stock to prevent shortfalls from supply-demand uncertainties.
             - Total Inventory Cost: The cumulative cost of ordering, holding, and storing goods.
