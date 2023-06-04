@@ -41,9 +41,9 @@ def sales_forecasting(product_sales):
     # Prepare data for sales forecasting
     product_sales['ordinal_datetime'] = product_sales['date'].map(datetime.datetime.toordinal).values.reshape(-1, 1)
     product_sales['month'] = product_sales['date'].dt.month
-    product_sales['week'] = product_sales['date'].dt.week
-    product_sales['sales_lag_1y'] = product_sales['sales'].shift(365)
     product_sales['week'] = product_sales['date'].dt.isocalendar().week
+    product_sales['sales_lag_1y'] = product_sales['sales'].shift(365)
+    product_sales = product_sales.dropna(subset=['sales_lag_1y'])
     y = product_sales['sales'].values
     X = product_sales[['ordinal_datetime', 'month', 'week', 'sales_lag_1y']]
     # Train a linear regression model
