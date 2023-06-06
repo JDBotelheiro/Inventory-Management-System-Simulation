@@ -13,12 +13,12 @@ def train_model(X, y):
     model.fit(X_train, y_train)
     return model, X_cal, y_cal
 
-def forecast_sales(model, future_dates, product_sales):
-    future_dates['y_forecast'] = model.predict(future_dates[['ordinal_datetime', 'month', 'week', 'sales_lag_1y']]).flatten()
-    return future_dates
+def forecast(model, future_dates, model_columns = ['ordinal_datetime', 'month', 'week', 'sales_lag_1y']):
+    y_forecast = model.predict(future_dates[model_columns]).flatten()
+    return y_forecast
 
-def calculate_intervals(model, X_cal, y_cal, future_dates):
-    y_hat_cal = model.predict(X_cal)
+def calculate_intervals(model, X_cal, y_cal, future_dates, model_columns = ['ordinal_datetime', 'month', 'week', 'sales_lag_1y']):
+    y_hat_cal = model.predict(X_cal[model_columns])
     X_cal["y_cal"] = y_hat_cal
     X_cal["residuals_cal"] = y_cal - y_hat_cal
 

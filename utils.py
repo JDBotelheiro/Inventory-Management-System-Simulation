@@ -3,12 +3,10 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import plotly.graph_objects as go
-import xgboost as xgb
 import datetime
 
 from math import sqrt
-from crepes import ConformalRegressor
-from sklearn.model_selection import train_test_split
+from model import *
 
 def load_data():
     supplier_info = pd.read_parquet('./data/supplier_info.parquet')
@@ -37,6 +35,7 @@ def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
+@st.cache_resource
 def sales_forecasting(product_sales):
     # Prepare data for sales forecasting
     product_sales['ordinal_datetime'] = product_sales['date'].map(datetime.datetime.toordinal).values.reshape(-1, 1)
@@ -47,13 +46,11 @@ def sales_forecasting(product_sales):
     y = product_sales['sales'].values
     X = product_sales[['ordinal_datetime', 'month', 'week', 'sales_lag_1y']]
     # Train a linear regression model
-    X_train, X_cal, y_train, y_cal = train_test_split(X, y, test_size=0.2, random_state=42)
-    model = xgb.XGBRegressor()
-    model.fit(X_train, y_train)
+    model, X_cal, y_cal = train_model(X, y)
     
     # Use the model to predict future sales
     future_dates = pd.DataFrame(pd.date_range(start=max(product_sales['date']), periods=30, freq='D')[1:], columns=['date'])
-    
+    # Preprocess future dates
     future_dates['ordinal_datetime'] = future_dates['date'].map(datetime.datetime.toordinal)
     future_dates['month'] = future_dates['date'].dt.month
     future_dates['week'] = future_dates['date'].dt.isocalendar().week.astype('int64')
@@ -62,24 +59,15 @@ def sales_forecasting(product_sales):
     combined_data = combined_data.sort_values(by="date")
     combined_data['sales_lag_1y'] = combined_data['sales'].shift(365)
     future_dates = combined_data[combined_data['date'].isin(future_dates['date'])]
-    future_dates['y_forecast'] = model.predict(future_dates[['ordinal_datetime', 'month', 'week', 'sales_lag_1y']]).flatten()
+    # Forecast sales
+    future_dates['y_forecast'] = forecast(model, future_dates)
     
     # Use calibration st to apply the model to calculate the residuals
     y_hat_cal = model.predict(X_cal)
     X_cal["y_cal"] = y_hat_cal
     X_cal["residuals_cal"] = y_cal - y_hat_cal
-    
-    # Fit a standard conformal regressor with the residual from the cal set
-    model_cps_std = ConformalRegressor().fit(residuals=X_cal['residuals_cal'].values)
-    # Calculate the conformal intervals
-    intervals = model_cps_std.predict(y_hat=future_dates['y_forecast'].values, confidence=0.80)
-    # Convert the list of arrays into a 2D numpy array
-    intervals_array = np.array(intervals)
-    # Create a DataFrame with the columns 'lower_bound' and 'upper_bound'
-    intervals_df = pd.DataFrame(intervals_array, columns=['lower_bound', 'upper_bound'])
-    # Add the 'lower_bound' and 'upper_bound' columns to the existing DataFrame
-    future_dates['y_forecast-lo-80'] = intervals_df['lower_bound'].reset_index(drop=True)
-    future_dates['y_forecast-hi-80'] = intervals_df['upper_bound'].reset_index(drop=True)
+    # Calculate conformal intervals
+    future_dates = calculate_intervals(model, X_cal, y_cal, future_dates)
 
     # Filter data for one year
     one_year_data = product_sales.loc[product_sales['date'] >= (product_sales['date'].max() - pd.DateOffset(years=1))]
