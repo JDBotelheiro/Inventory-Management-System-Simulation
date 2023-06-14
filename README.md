@@ -1,6 +1,8 @@
 # Inventory_Management_System_Simulation
 An interactive Python web application that assists users in inventory management and sales forecasting. This app can help optimize inventory levels and reduce costs related to overstock and stockouts.
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://jdbotelheiro-inventory-management-system-simulation-app-cns1rf.streamlit.app/)
+
 ## Description
 
 The application reads supplier and inventory data, displays a sales forecast for each product, and calculates the Economic Order Quantity (EOQ), safety stock levels, reorder points, and various risks for each component of a selected product. It displays these results on a user-friendly dashboard and provides a download option for the results.
